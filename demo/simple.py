@@ -29,7 +29,7 @@ for i in range(100):
     outs = exe.run(
         feed={'x':train_data, 'y':y_true},
         fetch_list=[y_predict, avg_cost])
-    print("{}, {}".format(i, outs))
+    print(f"{i}, {outs}")
 
 # 输出训练结果
 print(outs)
