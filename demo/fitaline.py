@@ -63,8 +63,10 @@ def save_result(points1, points2):
     plt.legend()
     plt.savefig('./image/prediction_gt.png')
 
+def trans(args, place, params_dirname):
+    '''
+    '''
 
-def main():
     batch_size = 20
 
     if args.enable_ce:
@@ -109,15 +111,13 @@ def main():
     sgd_optimizer.minimize(avg_loss)
 
     # can use CPU or GPU
-    use_cuda = args.use_gpu
-    place = fluid.CUDAPlace(0) if use_cuda else fluid.CPUPlace()
     exe = fluid.Executor(place)
 
     # Specify the directory to save the parameters
     params_dirname = "model/fitaline"
     num_epochs = args.num_epochs
 
-    # main train loop.
+    # 主训练。
     feeder = fluid.DataFeeder(place=place, feed_list=[x, y])
     exe.run(startup_program)
 
@@ -163,10 +163,15 @@ def main():
             print("kpis\ttrain_cost\t%f" % avg_loss_value[0])
             print("kpis\ttest_cost\t%f" % test_metics[0])
 
+def infer(place, params_dirname):
+    '''
+    预测。
+    '''
+
     infer_exe = fluid.Executor(place)
     inference_scope = fluid.core.Scope()
 
-    # infer
+    # 预测
     with fluid.scope_guard(inference_scope):
         [inference_program, feed_target_names, fetch_targets
          ] = fluid.io.load_inference_model(params_dirname, infer_exe)
@@ -187,17 +192,27 @@ def main():
             feed={feed_target_names[0]: numpy.array(infer_feat)},
             fetch_list=fetch_targets)
 
-        print("infer results: (House Price)")
+        print("预测结果: (房价)")
         for idx, val in enumerate(results[0]):
             print("%d: %.2f" % (idx, val))
 
-        print("\nground truth:")
+        print("\n真实数据:")
         for idx, val in enumerate(infer_label):
             print("%d: %.2f" % (idx, val))
 
         save_result(results[0], infer_label)
 
+def main(args):
+    params_dirname = "model/fitaline"
+    place = fluid.CUDAPlace(0) if args.use_gpu else fluid.CPUPlace()
+
+    # 训练
+    trans(args, place, params_dirname)
+
+    # 预测
+    infer(place, params_dirname)
+
 
 if __name__ == '__main__':
     args = parse_args()
-    main()
+    main(args)
