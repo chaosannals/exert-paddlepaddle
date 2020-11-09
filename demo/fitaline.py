@@ -65,10 +65,12 @@ def save_result(points1, points2):
 
 def trans(args, place, params_dirname):
     '''
+    训练。
     '''
 
     batch_size = 20
 
+    # 加载数据。
     if args.enable_ce:
         train_reader = paddle.batch(
             paddle.dataset.uci_housing.train(),
@@ -110,11 +112,7 @@ def trans(args, place, params_dirname):
     sgd_optimizer = fluid.optimizer.SGD(learning_rate=0.001)
     sgd_optimizer.minimize(avg_loss)
 
-    # can use CPU or GPU
     exe = fluid.Executor(place)
-
-    # Specify the directory to save the parameters
-    params_dirname = "model/fitaline"
     num_epochs = args.num_epochs
 
     # 主训练。
