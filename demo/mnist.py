@@ -1,5 +1,3 @@
-from __future__ import print_function
-
 import os
 import argparse
 from PIL import Image
@@ -36,16 +34,25 @@ def loss_net(hidden, label):
 
 
 def multilayer_perceptron(img, label):
+    '''
+    '''
+
     img = fluid.layers.fc(input=img, size=200, act='tanh')
     hidden = fluid.layers.fc(input=img, size=200, act='tanh')
     return loss_net(hidden, label)
 
 
 def softmax_regression(img, label):
+    '''
+    '''
+
     return loss_net(img, label)
 
 
 def convolutional_neural_network(img, label):
+    '''
+    '''
+
     conv_pool_1 = fluid.nets.simple_img_conv_pool(
         input=img,
         filter_size=5,
@@ -204,7 +211,7 @@ def infer(use_cuda,
             feed={feed_target_names[0]: tensor_img},
             fetch_list=fetch_targets)
         lab = numpy.argsort(results)
-        print("Inference result of image/infer_3.png is: %d" % lab[0][0][-1])
+        print("Inference result of asset/infer_3.png is: %d" % lab[0][0][-1])
 
 
 def main(use_cuda, nn_type):
@@ -232,6 +239,6 @@ if __name__ == '__main__':
     PASS_NUM = args.num_epochs
     use_cuda = args.use_gpu
     # predict = 'softmax_regression' # uncomment for Softmax
-    # predict = 'multilayer_perceptron' # uncomment for MLP
-    predict = 'convolutional_neural_network'  # uncomment for LeNet5
+    predict = 'multilayer_perceptron' # uncomment for MLP
+    # predict = 'convolutional_neural_network'  # uncomment for LeNet5
     main(use_cuda=use_cuda, nn_type=predict)
